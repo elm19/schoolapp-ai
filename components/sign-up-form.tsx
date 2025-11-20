@@ -23,6 +23,8 @@ export function SignUpForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [type, setType] = useState<"student" | "teacher">("student");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -45,6 +47,10 @@ export function SignUpForm({
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/protected`,
+          data: {
+            username,
+            type,
+          },
         },
       });
       if (error) throw error;
@@ -66,6 +72,31 @@ export function SignUpForm({
         <CardContent>
           <form onSubmit={handleSignUp}>
             <div className="flex flex-col gap-6">
+              <div className="grid gap-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="your username"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="type">Type</Label>
+                <select
+                  id="type"
+                  className="block w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none"
+                  value={type}
+                  onChange={(e) =>
+                    setType(e.target.value as "student" | "teacher")
+                  }
+                >
+                  <option value="student">Student</option>
+                  <option value="teacher">Teacher</option>
+                </select>
+              </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
