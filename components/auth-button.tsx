@@ -10,10 +10,9 @@ export async function AuthButton() {
   const { data } = await supabase.auth.getClaims();
 
   const user = data?.claims;
-
   return user ? (
     <div className="flex h-10 items-center gap-4">
-      Hey, {user.email}!
+      Hey, {user?.user_metadata?.type}!
       <LogoutButton />
     </div>
   ) : (
