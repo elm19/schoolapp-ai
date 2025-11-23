@@ -27,7 +27,7 @@ type Group = {
   menus: Menu[];
 };
 
-export function getMenuList(pathname: string): Group[] {
+export function getMenuList(): Group[] {
   return [
     {
       groupLabel: "",
@@ -36,39 +36,39 @@ export function getMenuList(pathname: string): Group[] {
           href: "/dashboard",
           label: "Dashboard",
           icon: LayoutGrid,
-          submenus: []
-        }
-      ]
+          submenus: [],
+        },
+      ],
     },
     {
       groupLabel: "Contents",
       menus: [
         {
           href: "",
-          label: "Posts",
+          label: "Courses",
           icon: SquarePen,
           submenus: [
             {
-              href: "/posts",
-              label: "All Posts"
+              href: "/courses",
+              label: "All My Courses",
             },
             {
-              href: "/posts/new",
-              label: "New Post"
-            }
-          ]
+              href: "/courses/new",
+              label: "Create",
+            },
+          ],
         },
         {
           href: "/categories",
           label: "Categories",
-          icon: Bookmark
+          icon: Bookmark,
         },
         {
           href: "/tags",
           label: "Tags",
-          icon: Tag
-        }
-      ]
+          icon: Tag,
+        },
+      ],
     },
     {
       groupLabel: "Settings",
@@ -76,14 +76,14 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "/users",
           label: "Users",
-          icon: Users
+          icon: Users,
         },
         {
           href: "/account",
           label: "Account",
-          icon: Settings
-        }
-      ]
-    }
+          icon: Settings,
+        },
+      ],
+    },
   ];
 }

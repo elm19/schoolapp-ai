@@ -9,7 +9,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  TooltipProvider
+  TooltipProvider,
 } from "@/components/ui/tooltip";
 import {
   DropdownMenu,
@@ -18,10 +18,25 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { createClient } from "@/lib/supabase/client";
+import { useEffect, useState } from "react";
+import { LogoutButton } from "../logout-button";
 
 export function UserNav() {
+  const supabase = createClient();
+  const [user, setUser] = useState<{
+    email?: string;
+    user_metadata: {username?: string};
+  } | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      console.log(data.user);
+      setUser(data.user);
+    });
+  }, [supabase.auth]);
   return (
     <DropdownMenu>
       <TooltipProvider disableHoverableContent>
@@ -34,7 +49,11 @@ export function UserNav() {
               >
                 <Avatar className="h-8 w-8">
                   <AvatarImage src="#" alt="Avatar" />
-                  <AvatarFallback className="bg-transparent">JD</AvatarFallback>
+                  <AvatarFallback className="bg-transparent">
+                    {user && user.user_metadata.username
+                      ? user.user_metadata.username.charAt(0).toUpperCase()
+                      : "U"}
+                  </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -46,9 +65,13 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">John Doe</p>
+            <p className="text-sm font-medium leading-none">
+              {user && user.user_metadata.username
+                ? user.user_metadata.username
+                : "User"}
+            </p>
             <p className="text-xs leading-none text-muted-foreground">
-              johndoe@example.com
+              {user && user.email}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -68,9 +91,9 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => {}}>
+        <DropdownMenuItem className="hover:cursor-pointer">
           <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
-          Sign out
+          <LogoutButton />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
