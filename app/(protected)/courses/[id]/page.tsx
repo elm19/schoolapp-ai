@@ -16,18 +16,31 @@ const CoursePage = async ({ params }: Props) => {
   try {
     const courseData = await supabase
       .from("courses")
-      .select(`*,profiles(username), announcements(*), quizzes(*)`)
+      .select(
+        `*,profiles(username), announcements(*), quizzes(*), course_enrollments(profiles(username, id))`
+      )
       .eq("id", id)
       .single();
     if (courseData.error) {
       throw courseData.error;
     }
-    const { title, overview, created_at, profiles, announcements, quizzes } =
-      courseData?.data ?? null;
+    
+    const {
+      title,
+      overview,
+      created_at,
+      profiles,
+      announcements,
+      quizzes,
+      course_enrollments,
+    } = courseData?.data ?? null;
     if (title === undefined) {
       throw new Error("Course not found or incomplete data");
     }
-    
+    const user = await supabase.auth.getUser();
+    const isJoinedInitial = course_enrollments.some(
+      (item: { profiles: { id: string }; }) => item.profiles.id === user.data.user?.id
+    );
     return (
       <ContentLayout title={title}>
         <div className="mx-auto py-6 space-y-6">
@@ -40,7 +53,7 @@ const CoursePage = async ({ params }: Props) => {
 
           <div className="max-w-md flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <ParticipantsCounter count={123} />
+              <ParticipantsCounter count={course_enrollments.length} />
             </div>
             <div className="flex items-center gap-2">
               <CourseActions
@@ -48,6 +61,8 @@ const CoursePage = async ({ params }: Props) => {
                 course_id={parseInt(id)}
                 // onGenerate={handleGenerate}
                 downloadHref={"/"}
+                userType={user.data.user?.user_metadata?.type}
+                isJoinedInitial={isJoinedInitial}
               />
             </div>
           </div>

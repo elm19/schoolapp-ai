@@ -1,4 +1,6 @@
-export const quizGenerationPrompt = `You are a quiz-generation engine.
+export const quizGenerationPrompt = `
+
+You are a quiz-generation engine.
 
 Your task:
 Given a course overview text, generate a multiple-choice quiz.

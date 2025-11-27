@@ -11,7 +11,6 @@ type Quiz = {
 type Props = { quizzes: Quiz[] };
 
 export const QuizzesSection = ({ quizzes }: Props) => {
-  console.log(quizzes);
   return (
     <section className="space-y-3">
       <h3 className="text-lg font-semibold">Quizzes</h3>

@@ -1,14 +1,23 @@
-// app/api/gemini-ai/route.ts (App Router)
 import { quizGenerationPrompt } from "@/constants/prompts";
 import { createClient } from "@/lib/supabase/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-001" }); // Or your preferred Gemini model
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-001" });
 
 export async function POST(req: Request) {
   try {
+    const supabase = await createClient();
+    const user = await supabase.auth.getUser();
+    if (!user.data.user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+    
+    // check if the user is logged in
     const { prompt, source, course_id } = await req.json();
     if (!prompt) {
       return NextResponse.json(
@@ -28,7 +37,7 @@ export async function POST(req: Request) {
       .replace(/```/g, "")
       .trim();
     const quizJson = JSON.parse(responseText);
-    const supabase = await createClient()
+    
     await supabase.from("quizzes").insert([
       {
         quiz_data: quizJson,

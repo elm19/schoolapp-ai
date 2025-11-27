@@ -14,14 +14,14 @@ import Link from "next/link";
 
 type Props = { params: Promise<{ id: string }> };
 
-type QuizQuestion = {
+export type QuizQuestion = {
   id: string | number;
   question: string;
   options: string[];
   correctAnswerIndex?: number;
 };
 
-type QuizRow = {
+export type QuizRow = {
   id: string;
   quiz_data: {
     quizTitle: string;
@@ -40,7 +40,8 @@ type QuizRow = {
 const CoursePage = async ({ params }: Props) => {
   const { id } = await params;
   const supabase = await createClient();
-
+  const user = await supabase.auth.getUser();
+  const isTeacher = user.data.user?.user_metadata?.type === "teacher";
   try {
     const quizData = await supabase
       .from("quizzes")
@@ -69,7 +70,10 @@ const CoursePage = async ({ params }: Props) => {
                 </Avatar>
                 <div>
                   <h2 className="text-xl font-bold">{title}</h2>
-                  <Link href={`/courses/${courses?.id}`} className="text-sm text-muted-foreground">
+                  <Link
+                    href={`/courses/${courses?.id}`}
+                    className="text-sm text-muted-foreground"
+                  >
                     {courses?.title}
                   </Link>
                   <div className="text-xs text-muted-foreground mt-1">
@@ -85,21 +89,28 @@ const CoursePage = async ({ params }: Props) => {
                     Download JSON
                   </Link>
                 </Button>
-                <Button size="sm">Settings</Button>
+                {isTeacher ? (
+                  <Button size="sm">Settings</Button>
+                ) : (
+                  <Link href={`/quiz/${id}/take`}>
+                    <Button>Take Quiz</Button>
+                  </Link>
+                )}
               </div>
             </CardHeader>
           </Card>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Questions</CardTitle>
-                  <CardDescription>
-                    List of questions from the quiz data
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
+              {isTeacher && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Questions</CardTitle>
+                    <CardDescription>
+                      List of questions from the quiz data
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
                     <div className="space-y-4">
                       {quiz_data?.questions?.length ? (
                         quiz_data.questions.map(
@@ -155,8 +166,9 @@ const CoursePage = async ({ params }: Props) => {
                         </div>
                       )}
                     </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             <div className="space-y-4">
