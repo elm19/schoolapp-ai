@@ -28,7 +28,6 @@ export default async function MyCoursesPage({ searchParams }: SearchParams) {
     console.error("Error fetching courses:", error);
     throw new Error("Failed to fetch courses");
   }
-  console.log("Fetched courses:", courses);
   return (
     <ContentLayout title="Courses">
       <div className="max-w-6xl mx-auto px-0 md:px-6 md:py-8">

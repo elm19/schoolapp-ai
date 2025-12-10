@@ -28,8 +28,8 @@ export type QuizRow = {
     questions: QuizQuestion[];
   };
   created_at: string;
-  available_from: string | null;
-  available_to: string | null;
+  available_from: string;
+  available_to: string;
   courses: {
     title: string;
     id: string;
@@ -46,7 +46,7 @@ const CoursePage = async ({ params }: Props) => {
     const quizData = await supabase
       .from("quizzes")
       // fixed select string
-      .select(`*,courses(title,id, profiles(username))`)
+      .select(`*,courses(title,id, profiles(username)), quizzes_sub(*)`)
       .eq("id", id)
       .single<QuizRow>();
 
@@ -107,7 +107,7 @@ const CoursePage = async ({ params }: Props) => {
                   <CardHeader>
                     <CardTitle>Questions</CardTitle>
                     <CardDescription>
-                      List of questions from the quiz data
+                      {isTeacher ? "List of questions generated for this quiz" :""}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
