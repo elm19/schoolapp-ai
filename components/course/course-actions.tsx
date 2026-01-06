@@ -76,8 +76,6 @@ export const CourseActions = ({
     }
   };
 
-
-
   return (
     <div className="flex gap-5">
       <div className="flex  gap-2">
@@ -88,9 +86,10 @@ export const CourseActions = ({
           {userType === "teacher" && (
             <CourseSettingsSheet
               courseId={course_id}
-              courseName={courseName}
-              courseDescription={courseDescription}
-              courseStatus={courseStatus}
+              courseName={courseName || ""}
+              courseDescription={courseDescription || ""}
+              courseStatus={courseStatus || "ongoing"}
+              participants={[]}
             />
           )}
         </div>

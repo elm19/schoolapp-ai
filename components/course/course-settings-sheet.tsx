@@ -51,10 +51,10 @@ type PDFFile = {
 
 type CourseSettingsSheetProps = {
   courseId: number;
-  courseName?: string;
-  courseDescription?: string;
-  courseStatus?: "ongoing" | "archived";
-  participants?: Participant[];
+  courseName: string;
+  courseDescription: string;
+  courseStatus: "ongoing" | "archived";
+  participants: Participant[];
   allowPublicEnroll?: boolean;
   supportFiles?: PDFFile[];
   onDeleteCourse?: () => void;
@@ -136,11 +136,19 @@ export const CourseSettingsSheet = ({
     // connect to supabase
     const supabase = createClient();
     console.log("SAVING COURSE SETTINGS ", data);
-    await supabase.from("courses").update({
-      title: data.title,
-      overview: data.description,
-    }).eq("id", courseId);
+    const res = await supabase
+      .from("courses")
+      .update({
+        title: data.title,
+        overview: data.description,
+        status: data.status,
+        is_public: data.isPublic,
+      })
+      .eq("id", courseId)
+      .select(); 
+    console.log("SAVE RESPONSE", res);
   };
+  console.log("RENDERING COURSE SETTINGS SHEET");
   // General Settings State
   const [title, setTitle] = useState(courseName);
   const [description, setDescription] = useState(courseDescription);
@@ -262,7 +270,7 @@ export const CourseSettingsSheet = ({
                 </label>
                 <Select
                   value={status}
-                  onValueChange={(value: any) => setStatus(value)}
+                  onValueChange={(value: "ongoing" | "archived") => setStatus(value)}
                 >
                   <SelectTrigger className="bg-background">
                     <SelectValue />
