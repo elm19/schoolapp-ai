@@ -28,6 +28,7 @@ const CoursePage = async ({ params }: Props) => {
     const {
       title,
       overview,
+      text_content,
       created_at,
       profiles,
       announcements,
@@ -59,8 +60,12 @@ const CoursePage = async ({ params }: Props) => {
               <CourseActions
                 courseOverview={overview}
                 course_id={parseInt(id)}
+                courseName={title}
+                courseDescription={overview}
+                courseStatus={"ongoing"}
                 // onGenerate={handleGenerate}
                 downloadHref={"/"}
+                content={text_content}
                 userType={user.data.user?.user_metadata?.type}
                 isJoinedInitial={isJoinedInitial}
               />

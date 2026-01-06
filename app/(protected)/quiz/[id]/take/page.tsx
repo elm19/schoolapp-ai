@@ -23,7 +23,6 @@ const TakeQuizPage = async ({ params }: Props) => {
     }
     const { questions } = quizData.data.quiz_data;
     const { available_to } = quizData.data;
-    console.log("Available to date:", available_to);
     return (
       <ContentLayout title={quizData.data.quiz_data?.quizTitle}>
         <CountDownTimer finishDate={new Date(available_to)} />

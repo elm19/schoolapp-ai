@@ -33,7 +33,6 @@ export function UserNav() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      console.log(data.user);
       setUser(data.user);
     });
   }, [supabase.auth]);

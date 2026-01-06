@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { slugify } from "@/lib/utils";
 
 const NewCourse = () => {
   const [title, setTitle] = useState("");
@@ -37,31 +38,43 @@ const NewCourse = () => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
-    // log the payload for now
-    // const payload = {
-    //   title,
-    //   overview,
-    //   pdf: pdfFile
-    //     ? { name: pdfFile.name, size: pdfFile.size, type: pdfFile.type }
-    //     : null,
-    // };
-
     try {
       const supabase = createClient();
       const user = await supabase.auth.getUser();
+      let res = null;
+      let pdfPath = null;
+      let extractedText = null;
+      if (pdfFile) {
+        const fileName = `${Date.now()}-${slugify(title)}`;
+        const { data, error: uploadError } = await supabase.storage
+          .from("courses-pdfs")
+          .upload(fileName, pdfFile);
 
+        res = data;
+        if (uploadError || !res) {
+          throw uploadError;
+        }
+        pdfPath = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${res.fullPath}`;
+
+        const resExtractedText = await fetch("/api/extract-pdf", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ path: pdfPath }),
+        });
+        extractedText = (await resExtractedText.json()).text;
+      }
       const response = await supabase.from("courses").insert([
         {
           title: title,
           overview: overview,
           created_by: user.data.user?.id as string,
+          file_url: pdfPath,
+          text_content: extractedText
         },
       ]);
-        
-        
 
-    //   console.log(response);
       if ((response as unknown as { error?: { message?: string } }).error) {
         throw new Error(
           (response as unknown as { error?: { message?: string } }).error
@@ -70,8 +83,8 @@ const NewCourse = () => {
       }
 
       // success: animate out form and show success message
-        setSuccess(true);
-        router.push("/courses");
+      setSuccess(true);
+      router.push("/courses");
     } catch (err) {
       console.error(err);
       const message =

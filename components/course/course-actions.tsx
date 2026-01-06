@@ -1,7 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { BookmarkIcon, Settings } from "lucide-react";
+import { BookmarkIcon } from "lucide-react";
 import { Spinner } from "../ui/spinner";
+import { CourseSettingsSheet } from "./course-settings-sheet";
 import { useState } from "react";
 // import { Toggle } from "../ui/toggle";
 
@@ -9,17 +10,25 @@ type Props = {
   onGenerate?: () => void;
   downloadHref?: string;
   courseOverview: string;
+  content?: string;
   course_id: number;
   userType?: string;
   isJoinedInitial?: boolean;
+  courseName?: string;
+  courseDescription?: string;
+  courseStatus?: "ongoing" | "archived";
 };
 
 export const CourseActions = ({
   downloadHref,
   courseOverview,
+  content,
   course_id,
   userType,
   isJoinedInitial,
+  courseName,
+  courseDescription,
+  courseStatus,
 }: Props) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -32,7 +41,11 @@ export const CourseActions = ({
     const payload =
       userType == "student"
         ? { course_id }
-        : { prompt: courseOverview, course_id, source: true };
+        : {
+            prompt: content ? content : courseOverview,
+            course_id,
+            source: true,
+          };
 
     setLoading(true);
     try {
@@ -50,7 +63,7 @@ export const CourseActions = ({
       }
 
       const response = await res.json();
-      if(response.message){
+      if (response.message) {
         if (userType == "student") {
           setIsJoined(true);
         }
@@ -62,7 +75,9 @@ export const CourseActions = ({
       setLoading(false);
     }
   };
-  console.log("USER TYPE IN COURSE ACTIONS:", userType);
+
+
+
   return (
     <div className="flex gap-5">
       <div className="flex  gap-2">
@@ -70,9 +85,14 @@ export const CourseActions = ({
           <Button variant="secondary">Download Materials</Button>
         </a>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Settings />
-          </Button>
+          {userType === "teacher" && (
+            <CourseSettingsSheet
+              courseId={course_id}
+              courseName={courseName}
+              courseDescription={courseDescription}
+              courseStatus={courseStatus}
+            />
+          )}
         </div>
       </div>
       {userType == "student" ? (

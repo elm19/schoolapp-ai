@@ -24,13 +24,10 @@ export function AddAnnouncement({ course_id }: { course_id: number }) {
     const supabase = createClient();
 
     try {
-      console.log("Course ID in AddAnnouncement:", course_id);
-
-      const res = await supabase.from("announcements").insert({
+      await supabase.from("announcements").insert({
         content: text,
         course_id: course_id,
       });
-      console.log("Saving announcement:", res);
       router.refresh();
     } catch (error) {
       console.error("Error saving announcement:", error);
