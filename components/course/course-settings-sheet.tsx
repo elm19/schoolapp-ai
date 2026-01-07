@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Settings, Eye, Trash2, UserPlus, UserX } from "lucide-react";
+import { Settings, Eye, Trash2, UserPlus, UserX, UploadIcon } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -33,13 +33,13 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/client";
+import { courseEnrollment } from "./course-actions";
 
 type Participant = {
   id: string;
-  name: string;
+  username: string;
   email: string;
-  avatar?: string;
-  status: "pending" | "accepted" | "rejected";
+  status?: "pending" | "accepted" | "rejected";
 };
 
 type PDFFile = {
@@ -54,39 +54,11 @@ type CourseSettingsSheetProps = {
   courseName: string;
   courseDescription: string;
   courseStatus: "ongoing" | "archived";
-  participants: Participant[];
-  allowPublicEnroll?: boolean;
+  participants: courseEnrollment[];
   supportFiles?: PDFFile[];
+  isPublicInitial: boolean;
   onDeleteCourse?: () => void;
 };
-
-// Dummy participants data
-const DUMMY_PARTICIPANTS: Participant[] = [
-  {
-    id: "1",
-    name: "Alice Johnson",
-    email: "alice.johnson@example.com",
-    status: "accepted",
-  },
-  {
-    id: "2",
-    name: "Bob Smith",
-    email: "bob.smith@example.com",
-    status: "accepted",
-  },
-  {
-    id: "3",
-    name: "Carol Williams",
-    email: "carol.williams@example.com",
-    status: "pending",
-  },
-  {
-    id: "4",
-    name: "David Brown",
-    email: "david.brown@example.com",
-    status: "accepted",
-  },
-];
 
 // Dummy PDF files
 const DUMMY_FILES: PDFFile[] = [
@@ -121,8 +93,8 @@ export const CourseSettingsSheet = ({
   courseName,
   courseDescription,
   courseStatus = "ongoing",
-  participants = DUMMY_PARTICIPANTS,
-  allowPublicEnroll = false,
+  participants,
+  isPublicInitial,
   supportFiles = DUMMY_FILES,
   onDeleteCourse,
 }: CourseSettingsSheetProps) => {
@@ -145,17 +117,17 @@ export const CourseSettingsSheet = ({
         is_public: data.isPublic,
       })
       .eq("id", courseId)
-      .select(); 
+      .select();
     console.log("SAVE RESPONSE", res);
   };
-  console.log("RENDERING COURSE SETTINGS SHEET");
+
   // General Settings State
   const [title, setTitle] = useState(courseName);
   const [description, setDescription] = useState(courseDescription);
   const [status, setStatus] = useState<"ongoing" | "archived">(courseStatus);
 
   // Participants Settings State
-  const [isPublic, setIsPublic] = useState(allowPublicEnroll);
+  const [isPublic, setIsPublic] = useState(isPublicInitial);
   const [participantsList, setParticipantsList] = useState(participants);
   const [selectedParticipant, setSelectedParticipant] =
     useState<Participant | null>(null);
@@ -174,17 +146,19 @@ export const CourseSettingsSheet = ({
   const handleAcceptParticipant = (participantId: string) => {
     setParticipantsList(
       participantsList.map((p) =>
-        p.id === participantId ? { ...p, status: "accepted" } : p
+        p.profiles.id === participantId ? { ...p, status: "accepted" } : p
       )
     );
+    console.log("ACCEPT PARTICIPANT ID ", participantId);
   };
 
   const handleRejectParticipant = (participantId: string) => {
-    setParticipantsList(
-      participantsList.map((p) =>
-        p.id === participantId ? { ...p, status: "rejected" } : p
-      )
-    );
+    // setParticipantsList(
+    //   participantsList.map((p) =>
+    //     p.id === participantId ? { ...p, status: "rejected" } : p
+    //   )
+    // );
+    console.log("REJECT PARTICIPANT ID ", participantId);
   };
 
   const handleDeleteFile = (fileId: string) => {
@@ -201,10 +175,10 @@ export const CourseSettingsSheet = ({
   };
 
   const acceptedParticipants = participantsList.filter(
-    (p) => p.status === "accepted"
+    (p) => p.profiles.status === "accepted"
   );
   const pendingParticipants = participantsList.filter(
-    (p) => p.status === "pending"
+    (p) => p.profiles.status === "pending"
   );
 
   return (
@@ -270,7 +244,9 @@ export const CourseSettingsSheet = ({
                 </label>
                 <Select
                   value={status}
-                  onValueChange={(value: "ongoing" | "archived") => setStatus(value)}
+                  onValueChange={(value: "ongoing" | "archived") =>
+                    setStatus(value)
+                  }
                 >
                   <SelectTrigger className="bg-background">
                     <SelectValue />
@@ -326,38 +302,36 @@ export const CourseSettingsSheet = ({
                     : "⚠ Enrollment requires your manual acceptance"}
                 </p>
               </div>
-
-              {/* Participants Count Cards */}
-              <div className="grid grid-cols-3 gap-3">
-                <Card className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-50 dark:from-emerald-950 dark:to-emerald-900 border-emerald-200 dark:border-emerald-800">
-                  <p className="text-xs font-semibold text-muted-foreground">
-                    Accepted
-                  </p>
-                  <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
-                    {acceptedParticipants.length}
-                  </p>
-                </Card>
-                <Card className="p-4 bg-gradient-to-br from-yellow-50 to-yellow-50 dark:from-yellow-950 dark:to-yellow-900 border-yellow-200 dark:border-yellow-800">
-                  <p className="text-xs font-semibold text-muted-foreground">
-                    Pending
-                  </p>
-                  <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mt-1">
-                    {pendingParticipants.length}
-                  </p>
-                </Card>
-                <Card className="p-4 bg-gradient-to-br from-purple-50 to-purple-50 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
-                  <p className="text-xs font-semibold text-muted-foreground">
-                    Total
-                  </p>
-                  <p className="text-3xl font-bold text-purple-600 dark:text-purple-400 mt-1">
-                    {participantsList.length}
-                  </p>
-                </Card>
-              </div>
+              {!isPublic && (
+                <div className="grid grid-cols-2 gap-3">
+                  <Card className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-50 dark:from-emerald-950 dark:to-emerald-900 border-emerald-200 dark:border-emerald-800">
+                    <p className="text-xs font-semibold text-muted-foreground">
+                      Accepted
+                    </p>
+                    <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+                      {acceptedParticipants.length}
+                    </p>
+                  </Card>
+                  <Card className="p-4 bg-gradient-to-br from-yellow-50 to-yellow-50 dark:from-yellow-950 dark:to-yellow-900 border-yellow-200 dark:border-yellow-800">
+                    <p className="text-xs font-semibold text-muted-foreground">
+                      Pending
+                    </p>
+                    <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mt-1">
+                      {pendingParticipants.length}
+                    </p>
+                  </Card>
+                </div>
+              )}
 
               {/* Participants List */}
               <div className="space-y-3">
-                <h4 className="text-sm font-semibold">Student List</h4>
+                <h4 className="text-sm font-semibold flex items-center justify-between">
+                  <span>Student List</span>
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    {participantsList.length} total
+                  </span>
+                </h4>
+                <Separator />
                 <div className="max-h-80 overflow-y-auto space-y-2 pr-2">
                   {participantsList.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground bg-muted/30 rounded-lg">
@@ -367,24 +341,21 @@ export const CourseSettingsSheet = ({
                     <div className="space-y-2">
                       {participantsList.map((participant) => (
                         <div
-                          key={participant.id}
+                          key={participant.profiles.username}
                           className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
                         >
                           <div className="flex items-center gap-3 flex-1 min-w-0">
                             <Avatar className="w-9 h-9 flex-shrink-0">
                               <AvatarFallback className="text-xs font-semibold">
-                                {participant.name
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
+                                {participant.profiles.username[0].toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium truncate">
-                                {participant.name}
+                                {participant.profiles.username}
                               </p>
                               <p className="text-xs text-muted-foreground truncate">
-                                {participant.email}
+                                {participant.profiles.email}
                               </p>
                             </div>
                           </div>
@@ -394,11 +365,13 @@ export const CourseSettingsSheet = ({
                             <Dialog
                               open={
                                 showParticipantDialog &&
-                                selectedParticipant?.id === participant.id
+                                selectedParticipant?.id ===
+                                  participant.profiles.id
                               }
                               onOpenChange={(isOpen) => {
                                 setShowParticipantDialog(isOpen);
-                                if (isOpen) setSelectedParticipant(participant);
+                                if (isOpen)
+                                  setSelectedParticipant(participant.profiles);
                               }}
                             >
                               <DialogTrigger asChild>
@@ -407,7 +380,7 @@ export const CourseSettingsSheet = ({
                                   size="sm"
                                   className="h-8 w-8 p-0"
                                   onClick={() =>
-                                    setSelectedParticipant(participant)
+                                    setSelectedParticipant(participant.profiles)
                                   }
                                 >
                                   <Eye className="w-4 h-4" />
@@ -421,19 +394,16 @@ export const CourseSettingsSheet = ({
                                   <div className="flex justify-center">
                                     <Avatar className="w-16 h-16">
                                       <AvatarFallback className="text-lg font-semibold">
-                                        {participant.name
-                                          .split(" ")
-                                          .map((n) => n[0])
-                                          .join("")}
+                                        {participant.profiles.username[0].toUpperCase()}
                                       </AvatarFallback>
                                     </Avatar>
                                   </div>
                                   <div className="text-center">
                                     <p className="font-semibold">
-                                      {participant.name}
+                                      {participant.profiles.username}
                                     </p>
                                     <p className="text-sm text-muted-foreground">
-                                      {participant.email}
+                                      {participant.profiles.email}
                                     </p>
                                   </div>
                                   <div className="bg-muted p-3 rounded-lg">
@@ -441,19 +411,22 @@ export const CourseSettingsSheet = ({
                                       Status
                                     </p>
                                     <p className="text-sm capitalize font-semibold">
-                                      {participant.status === "accepted" && (
+                                      {participant.profiles.status ===
+                                        "accepted" && (
                                         <span className="text-emerald-600">
-                                          ✓ {participant.status}
+                                          ✓ {participant.profiles.status}
                                         </span>
                                       )}
-                                      {participant.status === "pending" && (
+                                      {participant.profiles.status ===
+                                        "pending" && (
                                         <span className="text-yellow-600">
-                                          ⏳ {participant.status}
+                                          ⏳ {participant.profiles.status}
                                         </span>
                                       )}
-                                      {participant.status === "rejected" && (
+                                      {participant.profiles.status ===
+                                        "rejected" && (
                                         <span className="text-red-600">
-                                          ✗ {participant.status}
+                                          ✗ {participant.profiles.status}
                                         </span>
                                       )}
                                     </p>
@@ -461,49 +434,41 @@ export const CourseSettingsSheet = ({
                                 </div>
                               </DialogContent>
                             </Dialog>
+                            {isPublic === false && (
+                              <div>
+                                {/* Accept Button */}
+                                {participant.profiles.status === "pending" && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900"
+                                    onClick={() =>
+                                      handleAcceptParticipant(
+                                        participant.profiles.id
+                                      )
+                                    }
+                                    title="Accept participant"
+                                  >
+                                    <UserPlus className="w-4 h-4" />
+                                  </Button>
+                                )}
 
-                            {/* Accept Button */}
-                            {participant.status === "pending" && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900"
-                                onClick={() =>
-                                  handleAcceptParticipant(participant.id)
-                                }
-                                title="Accept participant"
-                              >
-                                <UserPlus className="w-4 h-4" />
-                              </Button>
-                            )}
-
-                            {/* Reject Button */}
-                            {participant.status === "pending" && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 text-red-600 hover:bg-red-100 dark:hover:bg-red-900"
-                                onClick={() =>
-                                  handleRejectParticipant(participant.id)
-                                }
-                                title="Reject participant"
-                              >
-                                <UserX className="w-4 h-4" />
-                              </Button>
-                            )}
-
-                            {/* Status Badge */}
-                            {participant.status !== "pending" && (
-                              <div
-                                className={`text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${
-                                  participant.status === "accepted"
-                                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-400"
-                                    : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-400"
-                                }`}
-                              >
-                                {participant.status === "accepted" && "✓"}
-                                {participant.status === "rejected" && "✗"}{" "}
-                                {participant.status}
+                                {/* Reject Button */}
+                                {participant.profiles.status === "pending" && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-red-600 hover:bg-red-100 dark:hover:bg-red-900"
+                                    onClick={() =>
+                                      handleRejectParticipant(
+                                        participant.profiles.id
+                                      )
+                                    }
+                                    title="Reject participant"
+                                  >
+                                    <UserX className="w-4 h-4" />
+                                  </Button>
+                                )}
                               </div>
                             )}
                           </div>
@@ -518,11 +483,16 @@ export const CourseSettingsSheet = ({
 
           {/* ===== SECTION 3: COURSE SUPPORT FILES ===== */}
           <div className="space-y-4">
-            <div className="space-y-1">
-              <h3 className="font-bold text-lg">📄 Course Support Files</h3>
-              <p className="text-xs text-muted-foreground">
-                Manage PDF materials and learning resources
-              </p>
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <h3 className="font-bold text-lg">📄 Course Support Files</h3>
+                <p className="text-xs text-muted-foreground">
+                  <span>Manage PDF materials and learning resources</span>
+                </p>
+              </div>
+              <Button variant="ghost" size="sm">
+                <UploadIcon className="w-10 h-10 inline-block" />
+              </Button>
             </div>
             <Separator className="mt-3" />
 

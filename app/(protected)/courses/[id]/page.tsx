@@ -4,12 +4,10 @@ import { CourseActions } from "@/components/course/course-actions";
 import { AnnouncementsSection } from "@/components/course/announcements-section";
 import { QuizzesSection } from "@/components/course/quizzes-section";
 import { DownloadSupport } from "@/components/course/download-support";
-import { ParticipantsCounter } from "@/components/course/participants-counter";
 import { createClient } from "@/lib/supabase/server";
-type Props = { params: Promise<{ id: string }>};
+type Props = { params: Promise<{ id: string }> };
 
 const CoursePage = async ({ params }: Props) => {
-
   const { id } = await params;
   const supabase = await createClient();
 
@@ -17,14 +15,14 @@ const CoursePage = async ({ params }: Props) => {
     const courseData = await supabase
       .from("courses")
       .select(
-        `*,profiles(username), announcements(*), quizzes(*), course_enrollments(profiles(username, id))`
+        `*,profiles(username), announcements(*), quizzes(*), course_enrollments(profiles(username, id, email))`
       )
       .eq("id", id)
       .single();
     if (courseData.error) {
       throw courseData.error;
     }
-    
+
     const {
       title,
       overview,
@@ -34,13 +32,16 @@ const CoursePage = async ({ params }: Props) => {
       announcements,
       quizzes,
       course_enrollments,
+
+      is_public,
     } = courseData?.data ?? null;
     if (title === undefined) {
       throw new Error("Course not found or incomplete data");
     }
     const user = await supabase.auth.getUser();
     const isJoinedInitial = course_enrollments.some(
-      (item: { profiles: { id: string }; }) => item.profiles.id === user.data.user?.id
+      (item: { profiles: { id: string } }) =>
+        item.profiles.id === user.data.user?.id
     );
     return (
       <ContentLayout title={title}>
@@ -50,13 +51,11 @@ const CoursePage = async ({ params }: Props) => {
             overview={overview}
             createdAt={created_at}
             creator={profiles.username}
+            participantsCount={course_enrollments.length}
           />
 
-          <div className="max-w-md flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <ParticipantsCounter count={course_enrollments.length} />
-            </div>
-            <div className="flex items-center gap-2">
+          <div className="items-center grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
               <CourseActions
                 courseOverview={overview}
                 course_id={parseInt(id)}
@@ -68,6 +67,8 @@ const CoursePage = async ({ params }: Props) => {
                 content={text_content}
                 userType={user.data.user?.user_metadata?.type}
                 isJoinedInitial={isJoinedInitial}
+                participants={course_enrollments}
+                isPublic={is_public}
               />
             </div>
           </div>

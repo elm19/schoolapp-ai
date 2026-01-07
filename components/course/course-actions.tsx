@@ -4,7 +4,14 @@ import { BookmarkIcon } from "lucide-react";
 import { Spinner } from "../ui/spinner";
 import { CourseSettingsSheet } from "./course-settings-sheet";
 import { useState } from "react";
-// import { Toggle } from "../ui/toggle";
+export interface courseEnrollment {
+  profiles: {
+    username: string;
+    id: string;
+    email: string;
+    status?: "pending" | "accepted" | "rejected";
+  };
+}
 
 type Props = {
   onGenerate?: () => void;
@@ -12,11 +19,13 @@ type Props = {
   courseOverview: string;
   content?: string;
   course_id: number;
-  userType?: string;
+  userType: string;
   isJoinedInitial?: boolean;
-  courseName?: string;
+  courseName: string;
   courseDescription?: string;
-  courseStatus?: "ongoing" | "archived";
+  courseStatus: "ongoing" | "archived";
+  participants: courseEnrollment[];
+  isPublic: boolean;
 };
 
 export const CourseActions = ({
@@ -29,6 +38,8 @@ export const CourseActions = ({
   courseName,
   courseDescription,
   courseStatus,
+  participants,
+  isPublic,
 }: Props) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -77,46 +88,48 @@ export const CourseActions = ({
   };
 
   return (
-    <div className="flex gap-5">
-      <div className="flex  gap-2">
+    <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between w-full">
+      <div className="flex items-center justify-between gap-3 w-full">
         <a href={downloadHref} download className="inline-block">
-          <Button variant="secondary">Download Materials</Button>
+          <Button variant="secondary" className="w-full sm:w-auto">
+            Download Materials
+          </Button>
         </a>
-        <div className="flex items-center gap-2">
-          {userType === "teacher" && (
-            <CourseSettingsSheet
-              courseId={course_id}
-              courseName={courseName || ""}
-              courseDescription={courseDescription || ""}
-              courseStatus={courseStatus || "ongoing"}
-              participants={[]}
-            />
-          )}
-        </div>
+
+        {userType === "teacher" && (
+          <CourseSettingsSheet
+            courseId={course_id}
+            courseName={courseName || ""}
+            courseDescription={courseDescription || ""}
+            courseStatus={courseStatus}
+            participants={participants}
+            isPublicInitial={isPublic}
+          />
+        )}
       </div>
-      {userType == "student" ? (
+
+      {userType === "student" ? (
         <Button
           disabled={loading}
-          variant={"outline"}
-          // className={`${
-          //   isJoined ? "bg-transparent fill-blue-500 stroke-blue-500" : ""
-          // }`}
+          variant="outline"
           onClick={onGenerateOnEnroll}
+          className="flex items-center gap-2 w-full sm:w-auto"
         >
           {loading ? (
             <Spinner />
           ) : (
             <BookmarkIcon
-              className={`${
-                isJoined ? "bg-transparent fill-blue-500 stroke-blue-500" : ""
-              }`}
+              className={isJoined ? "fill-blue-500 stroke-blue-500" : ""}
             />
           )}
           {isJoined ? "Enrolled" : "Enroll"}
         </Button>
       ) : (
-        // </Button>
-        <Button disabled={loading} onClick={onGenerateOnEnroll}>
+        <Button
+          disabled={loading}
+          onClick={onGenerateOnEnroll}
+          className="flex items-center gap-2 w-full sm:w-auto"
+        >
           {loading && <Spinner />}
           Generate Quiz
         </Button>

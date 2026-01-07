@@ -1,12 +1,12 @@
-import { Badge } from "@/components/ui/badge";
 
 type Props = { count: number };
 
 export const ParticipantsCounter = ({ count }: Props) => {
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-sm text-muted-foreground">Participants</span>
-      <Badge variant="secondary">{count}</Badge>
+    <div className="flex text-center items-center gap-2">
+      <span className="text-xs text-muted-foreground mt-1">
+        Participants {count}
+      </span>
     </div>
   );
 };
