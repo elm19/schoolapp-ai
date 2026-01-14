@@ -5,7 +5,11 @@ import { useEffect, useState } from "react";
 import { formUrlQuery, removeKeysFromUrlQuery } from "@jsmastery/utils";
 import { Input } from "./ui/input";
 
-const SearchInput = () => {
+interface SearchInputProps {
+  currentPathname: string;
+}
+
+const SearchInput = ({ currentPathname }: SearchInputProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -28,7 +32,7 @@ const SearchInput = () => {
           });
           router.push(newUrl, { scroll: false });
         } else {
-          if (pathname === "/courses") {
+          if (pathname === currentPathname) {
             const newUrl = removeKeysFromUrlQuery({
               params: searchParams.toString(),
               keysToRemove: ["search"],
@@ -41,7 +45,7 @@ const SearchInput = () => {
 
     // Cleanup function to clear the timeout
     return () => clearTimeout(timeoutId);
-  }, [searchQuery, searchParams, pathname, router]);
+  }, [searchQuery, searchParams, pathname, router, currentPathname]);
 
   return (
     <div className="relative flex-1">

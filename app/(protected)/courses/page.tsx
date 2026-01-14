@@ -10,6 +10,19 @@ import { ContentLayout } from "@/components/admin-panel/content-layout";
 import SearchInput from "@/components/search-input";
 import { createClient } from "@/lib/supabase/server";
 import { format } from "timeago.js";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "My Courses",
+  description:
+    "Browse and manage your enrolled courses. Create new courses and view course details.",
+  keywords: ["courses", "learning", "education"],
+  openGraph: {
+    title: "My Courses",
+    description: "Browse and manage your enrolled courses",
+    type: "website",
+  },
+};
 
 type SearchParams = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -33,7 +46,7 @@ export default async function MyCoursesPage({ searchParams }: SearchParams) {
       <div className="max-w-6xl mx-auto px-0 md:px-6 md:py-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-4 w-full max-w-2xl">
-            <SearchInput />
+            <SearchInput currentPathname="/courses" />
             <Link
               href="/courses"
               className="text-sm font-medium text-primary hover:underline"
@@ -43,9 +56,14 @@ export default async function MyCoursesPage({ searchParams }: SearchParams) {
           </div>
 
           <div className="flex justify-between w-full md:w-auto md:items-center md:gap-2">
-            <Button variant="outline" size="sm">
-              New Course
-            </Button>
+            <Link
+              href="/courses/new"
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              <Button variant="outline" size="sm">
+                New Course
+              </Button>
+            </Link>
             <Button variant="ghost" size="sm">
               Explore
             </Button>

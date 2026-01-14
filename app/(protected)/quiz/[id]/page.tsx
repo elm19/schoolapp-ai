@@ -11,8 +11,20 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
+import type { Metadata } from "next";
 
 type Props = { params: Promise<{ id: string }> };
+
+export const metadata: Metadata = {
+  title: "Quiz",
+  description: "Take a quiz and test your knowledge",
+  keywords: ["quiz", "assessment", "learning"],
+  openGraph: {
+    title: "Quiz",
+    description: "Take a quiz and test your knowledge",
+    type: "website",
+  },
+};
 
 export type QuizQuestion = {
   id: string | number;
@@ -107,7 +119,9 @@ const CoursePage = async ({ params }: Props) => {
                   <CardHeader>
                     <CardTitle>Questions</CardTitle>
                     <CardDescription>
-                      {isTeacher ? "List of questions generated for this quiz" :""}
+                      {isTeacher
+                        ? "List of questions generated for this quiz"
+                        : ""}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>

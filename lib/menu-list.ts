@@ -44,23 +44,13 @@ export function getMenuList(): Group[] {
       groupLabel: "Contents",
       menus: [
         {
-          href: "",
+          href: "/courses",
           label: "Courses",
           icon: SquarePen,
-          submenus: [
-            {
-              href: "/courses",
-              label: "All My Courses",
-            },
-            {
-              href: "/courses/new",
-              label: "Create",
-            },
-          ],
         },
         {
-          href: "/categories",
-          label: "Categories",
+          href: "/projects",
+          label: "Projects",
           icon: Bookmark,
         },
         {

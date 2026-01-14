@@ -5,7 +5,20 @@ import { AnnouncementsSection } from "@/components/course/announcements-section"
 import { QuizzesSection } from "@/components/course/quizzes-section";
 import { DownloadSupport } from "@/components/course/download-support";
 import { createClient } from "@/lib/supabase/server";
+import type { Metadata } from "next";
+
 type Props = { params: Promise<{ id: string }> };
+
+export const metadata: Metadata = {
+  title: "Course",
+  description: "View course details, announcements, and quizzes",
+  keywords: ["course", "learning", "education"],
+  openGraph: {
+    title: "Course",
+    description: "View course details, announcements, and quizzes",
+    type: "website",
+  },
+};
 
 const CoursePage = async ({ params }: Props) => {
   const { id } = await params;
