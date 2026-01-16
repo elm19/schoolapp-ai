@@ -1,5 +1,5 @@
 "use client";
-import { Copy, Eye, EyeOff, Plus, Trash2, Zap } from "lucide-react";
+import { Copy, Eye, EyeOff, Plus, Trash2, Zap, HelpCircle } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 interface ApiKey {
   id: string;
@@ -139,16 +140,25 @@ const APIKeySection = ({ apiKeys: initialKeys }: { apiKeys: ApiKey[] }) => {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Zap className="w-5 h-5" />
-              API Keys
+              Gemini API Keys
             </CardTitle>
             <CardDescription>
-              Manage your API keys for integrations and third-party services
+              Manage your Google Gemini API keys for AI-powered features. Get
+              your API key from Google Cloud Console.
             </CardDescription>
           </div>
-          <Button onClick={() => setIsCreateDialogOpen(true)} size="sm">
-            <Plus className="w-4 h-4 mr-2" />
-            New Key
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/settings/gemini-guide">
+                <HelpCircle className="w-4 h-4 mr-2" />
+                How to Get Key
+              </Link>
+            </Button>
+            <Button onClick={() => setIsCreateDialogOpen(true)} size="sm">
+              <Plus className="w-4 h-4 mr-2" />
+              New Key
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -228,23 +238,31 @@ const APIKeySection = ({ apiKeys: initialKeys }: { apiKeys: ApiKey[] }) => {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create New API Key</DialogTitle>
+            <DialogTitle>Add Gemini API Key</DialogTitle>
             <DialogDescription>
-              Enter your API key. Make sure to copy it and store it securely.
+              Enter your Google Gemini API key. Make sure to copy it and store
+              it securely. Don&apos;t have one yet?{" "}
+              <Link
+                href="/settings/gemini-guide"
+                className="font-semibold underline hover:no-underline"
+              >
+                Learn how to get one
+              </Link>
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="api-key">API Key</Label>
+              <Label htmlFor="api-key">Gemini API Key</Label>
               <Input
                 id="api-key"
-                placeholder="Enter your API key"
+                placeholder="Enter your Gemini API key from Google Cloud Console"
                 value={newKeyValue}
                 onChange={(e) => setNewKeyValue(e.target.value)}
                 type="password"
               />
               <p className="text-xs text-muted-foreground">
-                Your API key will be securely stored and used for integrations
+                Your Gemini API key will be securely stored and used for
+                AI-powered features
               </p>
             </div>
           </div>

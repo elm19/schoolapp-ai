@@ -54,8 +54,8 @@ export function getMenuList(): Group[] {
           icon: Bookmark,
         },
         {
-          href: "/stats",
-          label: "Stats",
+          href: "/org",
+          label: "Org",
           icon: Tag,
         },
       ],
