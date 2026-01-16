@@ -131,15 +131,7 @@ export const CourseActions = ({
           prompt={content ? content : courseOverview}
             courseId={course_id}
         />
-        // <Button
-        //   disabled={loading}
-        //   onClick={onGenerateOnEnroll}
-        //   className="flex items-center gap-2 w-full sm:w-auto"
-        // >
-        //     {loading && <Spinner />}
 
-        //   Generate Quiz
-        // </Button>
       )}
     </div>
   );
