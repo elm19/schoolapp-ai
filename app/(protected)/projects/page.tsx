@@ -30,7 +30,6 @@ const ProjectListPage = async ({ searchParams }: SearchParams) => {
   const userType = (await supabase.auth.getUser()).data.user?.user_metadata
     ?.type as UserType | undefined;
 
-  console.log("Current user type:", userType);
 
   const { data: projectsData, error } = await supabase
     .from("projects")
@@ -67,7 +66,6 @@ const ProjectListPage = async ({ searchParams }: SearchParams) => {
       }))
     : null;
 
-  console.log("Fetched projects:", projects);
 
   return (
     <ContentLayout title="Projects">

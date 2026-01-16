@@ -16,6 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Loader2, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Markdown } from "./ui/markdown";
 
 interface AskAISheetProps {
   pageContent?: Record<string, string>;
@@ -79,13 +80,10 @@ export function AskAISheet({
           source: false,
         }),
       });
-
       if (!res.ok) {
         throw new Error("Failed to get response");
       }
-
       const data = await res.json();
-      console.log("AI Response Data:", data);
       setResponse(data.output || "No response received");
     } catch (error) {
       setResponse(
@@ -101,8 +99,6 @@ export function AskAISheet({
   const handleClear = () => {
     setQuestion("");
     setResponse(null);
-    setScope("general");
-    setSelectedSections(new Set());
   };
 
   const toggleSection = (section: string) => {
@@ -158,7 +154,7 @@ export function AskAISheet({
                         htmlFor="page"
                         className="font-normal cursor-pointer"
                       >
-                        With Page Content
+                        Prompt Context
                       </Label>
                     </div>
                   )}
@@ -169,7 +165,7 @@ export function AskAISheet({
               {scope === "page" && pageSections.length > 0 && (
                 <div className="space-y-3 pl-4 border-l-2 border-muted-foreground">
                   <Label className="text-sm font-semibold">
-                    Select sections to include as context:
+                    Select sections to include:
                   </Label>
                   <div className="space-y-2">
                     {pageSections.map((section) => (
@@ -238,9 +234,7 @@ export function AskAISheet({
               <div className="space-y-3">
                 <Label className="text-base font-semibold">Response</Label>
                 <Card className="p-4 bg-muted">
-                  <p className="text-sm whitespace-pre-wrap leading-relaxed">
-                    {response}
-                  </p>
+                      <Markdown>{response}</Markdown>
                 </Card>
               </div>
 

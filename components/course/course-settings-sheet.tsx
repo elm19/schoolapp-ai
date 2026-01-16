@@ -107,7 +107,6 @@ export const CourseSettingsSheet = ({
   }) => {
     // connect to supabase
     const supabase = createClient();
-    console.log("SAVING COURSE SETTINGS ", data);
     const res = await supabase
       .from("courses")
       .update({
@@ -119,6 +118,7 @@ export const CourseSettingsSheet = ({
       .eq("id", courseId)
       .select();
     console.log("SAVE RESPONSE", res);
+    
   };
 
   // General Settings State

@@ -25,7 +25,6 @@ export default async function SettingsPage() {
     .select("*")
     .eq("user_id", user_d)
     .single();
-  console.log(platform);
   const apiKeys = keys.data || [];
   return (
     <ContentLayout title={"Settings"}>

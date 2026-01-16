@@ -30,12 +30,15 @@ type SearchParams = {
 export default async function MyCoursesPage({ searchParams }: SearchParams) {
   const filters = await searchParams;
   const searchQuery = filters.search ? filters.search.toString() : "";
+
   const supabase = await createClient();
   // select from the courses table in supabase
+  const user = (await supabase.auth.getUser()).data.user;
   const { data: courses, error } = await supabase
     .from("courses")
     .select(`id, title, created_at, profiles(username)`)
-    .ilike("title", `%${searchQuery}%`);
+    .ilike("title", `%${searchQuery}%`)
+    .eq("created_by", user?.id || 0);
 
   if (error) {
     console.error("Error fetching courses:", error);
@@ -58,9 +61,9 @@ export default async function MyCoursesPage({ searchParams }: SearchParams) {
                 New Course
               </Button>
             </Link>
-            <Link href="/courses/me">
+            <Link href={"/courses"}>
               <Button variant="ghost" size="sm">
-                My Courses
+                Explore
               </Button>
             </Link>
           </div>

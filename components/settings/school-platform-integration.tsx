@@ -61,12 +61,7 @@ export default function SchoolPlatformIntegration({
       return;
     }
 
-    // Console log the credentials
-    console.log("School Platform Integration Credentials:", {
-      organization: selectedOrg,
-      email: email,
-      password: password,
-    });
+
       
       try {
         const response = await fetch('/api/schoolapp-connect', {

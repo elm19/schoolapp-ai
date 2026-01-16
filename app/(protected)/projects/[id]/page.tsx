@@ -103,9 +103,8 @@ const ProjectPage = async ({ params }: Props) => {
               />
               <AskAISheet
                 pageContent={{
-                  overview: "Course overview text...",
-                  course_content: "Detailed content...",
-                  announcements: "Recent announcements..."
+                  overview: overview || "",
+                  course_content: details || "",
                 }}
               />
             </div>

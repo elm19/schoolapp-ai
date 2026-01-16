@@ -64,7 +64,6 @@ const CoursePage = async ({ params }: Props) => {
       .select(`*,courses(title,id, profiles(username)), quizzes_sub(*)`)
       .eq("id", id)
       .single<QuizRow>();
-    console.log(quizData);
     if (quizData.error || !quizData.data) {
       throw quizData.error ?? new Error("No quiz data");
     }

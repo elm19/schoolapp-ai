@@ -38,7 +38,6 @@ export default async function UsersPage({ searchParams }: SearchParams) {
       </ContentLayout>
     );
   }
-  console.log("Search query:", query);
   if (query.length < 3) {
     return (
       <ContentLayout title="Users">

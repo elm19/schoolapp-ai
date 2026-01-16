@@ -55,7 +55,6 @@ export const AddParticipantsSheet = ({
         .from("profiles")
         .select("id, email, username")
         .ilike("username", `%${searchQuery}%`);
-      console.log("Search Results:", data, error);
 
       if (error) {
         setSearchResults([]);
@@ -70,8 +69,6 @@ export const AddParticipantsSheet = ({
   }, [searchQuery, supabase]);
 
   const handleSelectParticipant = (participant: Participant) => {
-    console.log("Toggling participant:", participant);
-    console.log("Currently selected participants:", selectedParticipants);
     setSelectedParticipants((prev) => {
       // Check if already selected
       const isSelected = prev.some((p) => p.id === participant.id);
@@ -94,13 +91,6 @@ export const AddParticipantsSheet = ({
 
   const handleSubmit = async () => {
     if (selectedParticipants.length === 0) return;
-
-    console.log(
-      "Adding participants to project",
-      projectId,
-      ":",
-      selectedParticipants
-    );
     const { data, error } = await supabase.from("project_participants").insert(
       selectedParticipants.map((participant) => ({
         project_id: projectId,

@@ -22,7 +22,6 @@ const GradesPage = async () => {
     return <div>No student info available.</div>;
   }
   const absence = extractAbsenceSummary(res.data);
-  console.log(absence);
   return (
     <ContentLayout title={"Absence"}>
       <BreadcrumbOrg title={"Absence"} href={"/org/absence"} />

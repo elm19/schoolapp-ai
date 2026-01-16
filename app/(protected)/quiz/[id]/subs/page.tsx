@@ -25,7 +25,6 @@ const QuizSubPage = async ({ params }: Props) => {
       .eq("quiz_id", id)
       .order("created_at", { ascending: false });
 
-    console.log(quizSubData);
 
     if (quizSubData.error || !quizSubData.data) {
       throw quizSubData.error ?? new Error("No quiz data");

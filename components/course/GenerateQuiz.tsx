@@ -23,16 +23,18 @@ import {
 import { useRouter } from "next/navigation";
 
 interface GenerateQuizProps {
-    prompt: string;
-    courseId: number;
+  prompt: string;
+  courseId: number;
 }
 
 const GenerateQuiz = ({ prompt, courseId }: GenerateQuizProps) => {
-    const router = useRouter();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [quizName, setQuizName] = useState("");
-  const [numQuestions, setNumQuestions] = useState("");
-  const [difficulty, setDifficulty] = useState("");
+  const [quizName, setQuizName] = useState(
+    "Comprehensive Course Assessment Quiz"
+  );
+  const [numQuestions, setNumQuestions] = useState("10");
+  const [difficulty, setDifficulty] = useState("medium");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,15 +77,15 @@ const GenerateQuiz = ({ prompt, courseId }: GenerateQuizProps) => {
         throw new Error(errorData.error || "Something went wrong");
       }
 
-        await res.json();
-        router.refresh();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await res.json();
+      router.refresh();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.log(err.message || "An error occurred");
     } finally {
       setLoading(false);
     }
-      
+
     // Reset form
     setQuizName("");
     setNumQuestions("");
@@ -112,7 +114,7 @@ const GenerateQuiz = ({ prompt, courseId }: GenerateQuizProps) => {
             <Label htmlFor="quiz-name">Quiz Name</Label>
             <Input
               id="quiz-name"
-              placeholder="Enter quiz name"
+              placeholder="Comprehensive Course Assessment Quiz"
               value={quizName}
               onChange={(e) => setQuizName(e.target.value)}
               disabled={loading}
@@ -151,10 +153,12 @@ const GenerateQuiz = ({ prompt, courseId }: GenerateQuizProps) => {
               disabled={loading}
             >
               <SelectTrigger id="difficulty">
-                <SelectValue placeholder="Select difficulty level" />
+                <SelectValue placeholder="Medium" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="easy">Easy</SelectItem>
+                <SelectItem defaultChecked value="easy">
+                  Easy
+                </SelectItem>
                 <SelectItem value="medium">Medium</SelectItem>
                 <SelectItem value="hard">Hard</SelectItem>
               </SelectContent>

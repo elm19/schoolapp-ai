@@ -97,17 +97,6 @@ const CoursePage = async ({ params }: Props) => {
 
             <div className="space-y-4">
               <DownloadSupport href={"/"} />
-              <div className="p-4 rounded-md border">
-                <h4 className="font-medium">Settings</h4>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Course settings and permissions
-                </p>
-                <div className="mt-3">
-                  <a className="text-sm text-primary underline">
-                    Open settings
-                  </a>
-                </div>
-              </div>
             </div>
           </div>
         </div>
