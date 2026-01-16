@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
 import type { Metadata } from "next";
+import UserSubmissionCard from "@/components/quiz/user-submission-card";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -47,6 +48,8 @@ export type QuizRow = {
     id: string;
     profiles?: { username?: string } | null;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  quizzes_sub?: any;
 };
 
 const CoursePage = async ({ params }: Props) => {
@@ -61,7 +64,7 @@ const CoursePage = async ({ params }: Props) => {
       .select(`*,courses(title,id, profiles(username)), quizzes_sub(*)`)
       .eq("id", id)
       .single<QuizRow>();
-
+    console.log(quizData);
     if (quizData.error || !quizData.data) {
       throw quizData.error ?? new Error("No quiz data");
     }
@@ -102,7 +105,9 @@ const CoursePage = async ({ params }: Props) => {
                   </Link>
                 </Button>
                 {isTeacher ? (
-                  <Button size="sm">Settings</Button>
+                  <Link href={`/quiz/${id}/settings`}>
+                    <Button size="sm">Settings</Button>
+                  </Link>
                 ) : (
                   <Link href={`/quiz/${id}/take`}>
                     <Button>Take Quiz</Button>
@@ -183,6 +188,13 @@ const CoursePage = async ({ params }: Props) => {
                   </CardContent>
                 </Card>
               )}
+              {!isTeacher && quizData.data && quizData.data.quizzes_sub && (
+                <UserSubmissionCard
+                  submissions={quizData.data.quizzes_sub}
+                  currentUserId={user.data.user?.id || ""}
+                  questions={quiz_data?.questions || []}
+                />
+              )}
             </div>
 
             <div className="space-y-4">
@@ -201,24 +213,18 @@ const CoursePage = async ({ params }: Props) => {
                     </div>
                     <div className="my-2" />
                     <div>
-                      <strong>Course:</strong> {courses?.title ?? "—"}
+                      <strong>Course:</strong>
+                      <Link
+                        href={`/courses/${courses?.id}`}
+                        className="ml-1 underline"
+                      >
+                        {courses?.title ?? "—"}
+                      </Link>
                     </div>
                     <div>
                       <strong>Creator:</strong>{" "}
                       {courses?.profiles?.username ?? "—"}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Actions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col gap-2">
-                    <Button>Preview</Button>
-                    <Button variant="ghost">Export</Button>
                   </div>
                 </CardContent>
               </Card>

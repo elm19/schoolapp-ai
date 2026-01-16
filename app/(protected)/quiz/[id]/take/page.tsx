@@ -26,7 +26,7 @@ const TakeQuizPage = async ({ params }: Props) => {
     return (
       <ContentLayout title={quizData.data.quiz_data?.quizTitle}>
         <CountDownTimer finishDate={new Date(available_to)} />
-        <QuizForm questions={questions.slice(0,1)} quizId={id} />
+        <QuizForm questions={questions} quizId={id} />
       </ContentLayout>
     );
   } catch (error) {

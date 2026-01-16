@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { useRouter } from "next/navigation";
 
 interface GenerateQuizProps {
     prompt: string;
@@ -27,6 +28,7 @@ interface GenerateQuizProps {
 }
 
 const GenerateQuiz = ({ prompt, courseId }: GenerateQuizProps) => {
+    const router = useRouter();
   const [open, setOpen] = useState(false);
   const [quizName, setQuizName] = useState("");
   const [numQuestions, setNumQuestions] = useState("");
@@ -73,13 +75,15 @@ const GenerateQuiz = ({ prompt, courseId }: GenerateQuizProps) => {
         throw new Error(errorData.error || "Something went wrong");
       }
 
-      await res.json();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await res.json();
+        router.refresh();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.log(err.message || "An error occurred");
     } finally {
       setLoading(false);
     }
+      
     // Reset form
     setQuizName("");
     setNumQuestions("");
