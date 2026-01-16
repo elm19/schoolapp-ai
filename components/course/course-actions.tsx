@@ -4,6 +4,7 @@ import { BookmarkIcon } from "lucide-react";
 import { Spinner } from "../ui/spinner";
 import { CourseSettingsSheet } from "./course-settings-sheet";
 import { useState } from "react";
+import GenerateQuiz from "./GenerateQuiz";
 export interface courseEnrollment {
   profiles: {
     username: string;
@@ -44,6 +45,7 @@ export const CourseActions = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isJoined, setIsJoined] = useState(isJoinedInitial);
+
 
   console.log("I AM THE ERROR AT THE COURSE ACTIONS COMPONENT ", error);
 
@@ -125,14 +127,19 @@ export const CourseActions = ({
           {isJoined ? "Enrolled" : "Enroll"}
         </Button>
       ) : (
-        <Button
-          disabled={loading}
-          onClick={onGenerateOnEnroll}
-          className="flex items-center gap-2 w-full sm:w-auto"
-        >
-          {loading && <Spinner />}
-          Generate Quiz
-        </Button>
+        <GenerateQuiz
+          prompt={content ? content : courseOverview}
+            courseId={course_id}
+        />
+        // <Button
+        //   disabled={loading}
+        //   onClick={onGenerateOnEnroll}
+        //   className="flex items-center gap-2 w-full sm:w-auto"
+        // >
+        //     {loading && <Spinner />}
+
+        //   Generate Quiz
+        // </Button>
       )}
     </div>
   );

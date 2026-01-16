@@ -1,4 +1,4 @@
-import { quizGenerationPrompt } from "@/constants/prompts";
+import { generateQuizzPrompt } from "@/constants/prompts";
 import { createClient } from "@/lib/supabase/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     }
     
     // check if the user is logged in
-    const { prompt, source, course_id } = await req.json();
+    const { prompt, source, course_id, quizInfo } = await req.json();
     if (!prompt) {
       return NextResponse.json(
         { error: "Prompt is required" },
@@ -27,7 +27,9 @@ export async function POST(req: Request) {
     }
     let finalPrompt = prompt;
     if (course_id && source) {
-      finalPrompt = quizGenerationPrompt + `\n\nCourse Overview:\n${prompt}`;
+      finalPrompt = generateQuizzPrompt(prompt, quizInfo);
+      console.log("FINAL PROMPT WITH QUIZ INFO: ", finalPrompt);
+      // finalPrompt = quizGenerationPrompt + `\n\nCourse Overview:\n${prompt}`;
     }
 
     const result = await model.generateContent(finalPrompt);
