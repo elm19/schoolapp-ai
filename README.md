@@ -83,7 +83,7 @@ A modern, full-featured learning management system (LMS) built with Next.js, Sup
 1. **Clone the repository**
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/elm19/schoolapp-ai
    cd schoolapp-ai
    ```
 
