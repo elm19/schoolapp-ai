@@ -4,7 +4,6 @@ import {
   Settings,
   Bookmark,
   SquarePen,
-  LayoutGrid,
   LucideIcon
 } from "lucide-react";
 
@@ -29,17 +28,6 @@ type Group = {
 
 export function getMenuList(): Group[] {
   return [
-    {
-      groupLabel: "",
-      menus: [
-        {
-          href: "/dashboard",
-          label: "Dashboard",
-          icon: LayoutGrid,
-          submenus: [],
-        },
-      ],
-    },
     {
       groupLabel: "Contents",
       menus: [

@@ -55,6 +55,7 @@ Output rules (VERY IMPORTANT):
 Generation rules:
 - Create exactly ${quizInfo.numQuestions} questions unless stated otherwise.
 - Quiz Title: ${quizInfo.quizName}
+- course content text: ${prompt}
 - Difficulty Level: ${quizInfo.difficulty} from easy, medium, hard.
 - Each question must have 4 options.
 - The quiz must ONLY use information from the provided text.

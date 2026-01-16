@@ -26,18 +26,23 @@ const OrgPage = async () => {
       id: "absence",
       label: "Absence",
       description: "Track attendance and absences",
+      disabled: false,
     },
-    { id: "grades", label: "Grades", description: "View your grades" },
-    { id: "document", label: "Document", description: "Access documents" },
+    { id: "grades", label: "Grades", description: "View your grades", disabled: false},
+    {
+      id: "document", label: "Document", description: "Access documents" , disabled: true
+    },
     {
       id: "calculator",
       label: "Calculator",
       description: "Use the calculator tool",
+      disabled: true,
     },
     {
       id: "calendar",
       label: "Calendar",
       description: "View the school calendar",
+      disabled: true,
     },
   ];
 
@@ -73,7 +78,7 @@ const OrgPage = async () => {
                   <CardDescription>{page.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full" disabled={page.disabled}>
                     Access
                   </Button>
                 </CardContent>

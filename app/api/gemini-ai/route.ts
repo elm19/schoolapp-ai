@@ -62,7 +62,6 @@ export async function POST(req: Request) {
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
-    const quizJson = JSON.parse(responseText);
 
     // Update usage stats if using Supabase key
     if (supabaseKeyId) {
@@ -87,6 +86,23 @@ export async function POST(req: Request) {
         console.warn("Failed to update API key usage stats", updateError);
         // Don't fail the request if usage update fails
       }
+    }
+    console.log("Gemini API response:", responseText);
+    if (source !== true) {
+      return NextResponse.json({ output: responseText });
+    }
+
+    // Try to parse JSON, handling cases where markdown formatting might be present
+    let quizJson;
+    try {
+      quizJson = JSON.parse(responseText);
+    } catch {
+      // If parsing fails, try to extract JSON from the response
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error("No valid JSON found in response");
+      }
+      quizJson = JSON.parse(jsonMatch[0]);
     }
 
     await supabase.from("quizzes").insert([

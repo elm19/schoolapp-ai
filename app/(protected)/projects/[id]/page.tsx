@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Markdown } from "@/components/ui/markdown";
 import type { Metadata } from "next";
 import ProgressTab from "@/components/project/progress-tab";
+import { AskAISheet } from "@/components/ask-ai-sheet";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -38,8 +39,6 @@ const ProjectPage = async ({ params }: Props) => {
     if (projectData.error) {
       throw projectData.error;
     }
-
-    console.log("Fetched project data:", projectData);
 
     const {
       id: projectId,
@@ -97,7 +96,19 @@ const ProjectPage = async ({ params }: Props) => {
                 projectId={projectId}
               />
             </div>
-            <ProjectSettingsMenu projectId={projectId} isCreator={isCreator} />
+            <div className="flex items-center flex-col gap-2">
+              <ProjectSettingsMenu
+                projectId={projectId}
+                isCreator={isCreator}
+              />
+              <AskAISheet
+                pageContent={{
+                  overview: "Course overview text...",
+                  course_content: "Detailed content...",
+                  announcements: "Recent announcements..."
+                }}
+              />
+            </div>
           </div>
 
           {/* Participants Section - Show if creator has participants or if not creator */}
@@ -116,7 +127,11 @@ const ProjectPage = async ({ params }: Props) => {
             className="prose prose-sm max-w-none rounded-lg border px-6 py-2 mb-10"
           >
             <TabsList className="border-b">
-              <TabsTrigger defaultChecked className="text-xl p-2" value="progress">
+              <TabsTrigger
+                defaultChecked
+                className="text-xl p-2"
+                value="progress"
+              >
                 Progress
               </TabsTrigger>
               <TabsTrigger className="text-xl p-2" value="details">

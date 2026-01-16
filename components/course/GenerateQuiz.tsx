@@ -98,7 +98,7 @@ const GenerateQuiz = ({ prompt, courseId }: GenerateQuizProps) => {
           Generate Quiz
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full sm:w-[400px]">
+      <SheetContent side="right" className="w-full p-2 sm:w-[400px]">
         <SheetHeader>
           <SheetTitle>Generate Quiz</SheetTitle>
           <SheetDescription>

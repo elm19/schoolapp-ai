@@ -403,3 +403,34 @@ export async function getStudyPlan(params: {
   const html = await response.text();
   return extractStudyPlan(html);
 }
+
+export function extractAbsenceSummary(html: string): {
+  total: { justified: number; nonJustified: number };
+  elements: Record<string, { justified: number; nonJustified: number }>;
+} {
+  const $ = cheerio.load(html);
+
+  const result = {
+    total: { justified: 0, nonJustified: 0 },
+    elements: {} as Record<string, { justified: number; nonJustified: number }>,
+  };
+
+  // First absence table (bilan)
+  const table = $("table").first();
+
+  table.find("tbody tr").each((_, row) => {
+    const cols = $(row).find("td");
+    if (cols.length < 4) return;
+
+    const code = $(cols[0]).text().trim();
+    const nonJustified = Number($(cols[2]).text().trim());
+    const justified = Number($(cols[3]).text().trim());
+
+    result.elements[code] = { justified, nonJustified };
+
+    result.total.justified += justified;
+    result.total.nonJustified += nonJustified;
+  });
+
+  return result;
+}
