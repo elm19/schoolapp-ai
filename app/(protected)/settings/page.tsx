@@ -17,7 +17,6 @@ import {
   Copy,
   Eye,
   EyeOff,
-  Lock,
   Plus,
   Trash2,
   Zap,
@@ -25,6 +24,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
+import { ProfileForm } from "@/components/settings/profile-form";
+import { PasswordChangeForm } from "@/components/settings/password-change-form";
 
 interface ApiKey {
   id: string;
@@ -35,10 +36,6 @@ interface ApiKey {
 }
 
 export default function SettingsPage() {
-  const [fullName, setFullName] = useState("John Doe");
-  const [email, setEmail] = useState("john@example.com");
-  const [username, setUsername] = useState("johndoe");
-
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([
     {
       id: "key_1",
@@ -57,51 +54,6 @@ export default function SettingsPage() {
   ]);
 
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
-  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
-  const [isLoadingPassword, setIsLoadingPassword] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
-
-  // Profile operations
-  const handleUpdateProfile = async () => {
-    setIsLoadingProfile(true);
-    // TODO: Implement actual profile update
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      toast.success("Profile updated successfully");
-    } catch {
-      toast.error("Failed to update profile");
-    } finally {
-      setIsLoadingProfile(false);
-    }
-  };
-
-  // Password operations
-  const handleUpdatePassword = async () => {
-    if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-    if (newPassword.length < 8) {
-      toast.error("Password must be at least 8 characters");
-      return;
-    }
-
-    setIsLoadingPassword(true);
-    // TODO: Implement actual password update
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      toast.success("Password updated successfully");
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch {
-      toast.error("Failed to update password");
-    } finally {
-      setIsLoadingPassword(false);
-    }
-  };
 
   // API Key operations
   const handleCopyKey = (key: string) => {
@@ -151,113 +103,10 @@ export default function SettingsPage() {
         </div>
 
         {/* Profile Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
-            <CardDescription>
-              Update your personal information and preferences
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="fullname">Full Name</Label>
-                  <Input
-                    id="fullname"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Enter your full name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
-                  <Input
-                    id="username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Enter your username"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                />
-              </div>
-              <Button onClick={handleUpdateProfile} disabled={isLoadingProfile}>
-                {isLoadingProfile ? "Saving..." : "Save Changes"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <ProfileForm />
 
         {/* Password Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lock className="w-5 h-5" />
-              Change Password
-            </CardTitle>
-            <CardDescription>
-              Update your password to keep your account secure
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="current-password">Current Password</Label>
-                <Input
-                  id="current-password"
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Enter your current password"
-                />
-              </div>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="new-password">New Password</Label>
-                  <Input
-                    id="new-password"
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Enter new password"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirm Password</Label>
-                  <Input
-                    id="confirm-password"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm new password"
-                  />
-                </div>
-              </div>
-              <div className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-blue-600 dark:text-blue-400">
-                  Password must be at least 8 characters long
-                </p>
-              </div>
-              <Button
-                onClick={handleUpdatePassword}
-                disabled={isLoadingPassword}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                {isLoadingPassword ? "Updating..." : "Update Password"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <PasswordChangeForm />
 
         {/* API Keys Section */}
         <Card>

@@ -33,9 +33,44 @@ const QuizSubPage = async ({ params }: Props) => {
 
     const title = "Quiz Submissions Page";
 
+    // Calculate statistics
+    const marks = quizSubData.data.map((sub) => sub.mark || 0);
+    const totalSubmissions = marks.length;
+    const totalMarks = marks.reduce((sum, mark) => sum + mark, 0);
+    const averageMarks =
+      totalSubmissions > 0 ? (totalMarks / totalSubmissions).toFixed(2) : 0;
+    const maxMarks = totalSubmissions > 0 ? Math.max(...marks) : 0;
+    const minMarks = totalSubmissions > 0 ? Math.min(...marks) : 0;
+
     return (
       <ContentLayout title={title}>
         <div className="mx-auto py-6">
+          {/* Statistics Component */}
+          {totalSubmissions > 0 && (
+            <div className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-gray-600">Total Submissions</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {totalSubmissions}
+                </p>
+              </div>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-sm text-gray-600">Average Marks</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {averageMarks}
+                </p>
+              </div>
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <p className="text-sm text-gray-600">Max Marks</p>
+                <p className="text-2xl font-bold text-purple-600">{maxMarks}</p>
+              </div>
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <p className="text-sm text-gray-600">Min Marks</p>
+                <p className="text-2xl font-bold text-orange-600">{minMarks}</p>
+              </div>
+            </div>
+          )}
+
           {quizSubData.data.length === 0 ? (
             <div className="text-center text-muted-foreground">
               <p>No submissions yet</p>
@@ -79,31 +114,108 @@ const QuizSubPage = async ({ params }: Props) => {
                           <div className="mt-2 text-sm bg-gray-50 p-3 rounded overflow-auto max-h-96 space-y-3">
                             {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
                             {/* @ts-ignore */}
+
                             {submission.quizzes?.quiz_data?.questions?.map(
-                              (question: any, qIndex: number) => (
-                                <div
-                                  key={qIndex}
-                                  className="border-l-4 border-blue-500 pl-3 py-2"
-                                >
-                                  <p className="font-semibold text-gray-800">
-                                    Q{qIndex + 1}: {question.question}
-                                  </p>
-                                  <p className="text-gray-600 mt-1">
-                                    <span className="font-medium">
-                                      Student's Answer:
-                                    </span>{" "}
-                                    {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                                    {/* @ts-ignore */}
-                                    {submission.sub?.[String(qIndex + 1)] ||
-                                      "Not answered"}
-                                  </p>
-                                  {question.options && (
-                                    <p className="text-gray-500 text-xs mt-1">
-                                      Options: {question.options.join(", ")}
+                              (
+                                question: Record<string, unknown>,
+                                qIndex: number
+                              ) => {
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
+                                const studentAnswerIndex = Number(
+                                  submission.sub?.[String(qIndex + 1)]
+                                );
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
+                                const correctAnswerIndex: number =
+                                  question.correctAnswerIndex;
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
+                                const options: string[] =
+                                  question.options || [];
+
+                                const isAnswered =
+                                  studentAnswerIndex !== null &&
+                                  studentAnswerIndex !== undefined &&
+                                  !Number.isNaN(studentAnswerIndex);
+                                const isCorrect =
+                                  isAnswered &&
+                                  studentAnswerIndex === correctAnswerIndex;
+
+                                const studentAnswerText = isAnswered
+                                  ? (options as string[])[studentAnswerIndex] ||
+                                    "Invalid answer"
+                                  : "Not answered";
+                                const correctAnswerText =
+                                  (options as string[])[correctAnswerIndex] ||
+                                  "N/A";
+
+                                return (
+                                  <div
+                                    key={qIndex}
+                                    className={`border-l-4 pl-3 py-2 ${
+                                      isCorrect
+                                        ? "border-green-500 bg-green-50"
+                                        : isAnswered
+                                        ? "border-red-500 bg-red-50"
+                                        : "border-gray-300 bg-gray-50"
+                                    }`}
+                                  >
+                                    <div className="flex items-start justify-between">
+                                      <p className="font-semibold text-gray-800">
+                                        Q{qIndex + 1}:{" "}
+                                        {String(question.question)}
+                                      </p>
+                                      <span
+                                        className={`text-xs font-bold px-2 py-1 rounded ${
+                                          isCorrect
+                                            ? "bg-green-200 text-green-800"
+                                            : isAnswered
+                                            ? "bg-red-200 text-red-800"
+                                            : "bg-gray-200 text-gray-800"
+                                        }`}
+                                      >
+                                        {isCorrect
+                                          ? "✓ Correct"
+                                          : isAnswered
+                                          ? "✗ Wrong"
+                                          : "⊘ Unanswered"}
+                                      </span>
+                                    </div>
+                                    <p className="text-gray-600 mt-2">
+                                      <span className="font-medium">
+                                        Student&apos;s Answer:
+                                      </span>{" "}
+                                      <span
+                                        className={
+                                          isCorrect
+                                            ? "text-green-700 font-medium"
+                                            : isAnswered
+                                            ? "text-red-700 font-medium"
+                                            : "text-gray-500"
+                                        }
+                                      >
+                                        {studentAnswerText}
+                                      </span>
                                     </p>
-                                  )}
-                                </div>
-                              )
+                                    {!isCorrect && isAnswered && (
+                                      <p className="text-gray-600 mt-1">
+                                        <span className="font-medium">
+                                          Correct Answer:
+                                        </span>{" "}
+                                        <span className="text-green-700 font-medium">
+                                          {correctAnswerText}
+                                        </span>
+                                      </p>
+                                    )}
+                                    {options.length > 0 && (
+                                      <p className="text-gray-500 text-xs mt-1">
+                                        Options: {options.join(", ")}
+                                      </p>
+                                    )}
+                                  </div>
+                                );
+                              }
                             )}
                           </div>
                         </details>
