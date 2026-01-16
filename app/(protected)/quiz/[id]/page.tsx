@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
 import type { Metadata } from "next";
 import UserSubmissionCard from "@/components/quiz/user-submission-card";
+import { AskAISheet } from "@/components/ask-ai-sheet";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -104,9 +105,12 @@ const CoursePage = async ({ params }: Props) => {
                   </Link>
                 </Button>
                 {isTeacher ? (
-                  <Link href={`/quiz/${id}/settings`}>
-                    <Button size="sm">Settings</Button>
-                  </Link>
+                  <div className="flex items-center align-center gap-2">
+                    <Link href={`/quiz/${id}/settings`}>
+                      <Button size="sm">Settings</Button>
+                    </Link>
+                    <AskAISheet />
+                  </div>
                 ) : (
                   <Link href={`/quiz/${id}/take`}>
                     <Button>Take Quiz</Button>

@@ -1,10 +1,10 @@
 import {
-  Tag,
+  BookOpen,
+  Briefcase,
+  Building,
   Users,
   Settings,
-  Bookmark,
-  SquarePen,
-  LucideIcon
+  LucideIcon,
 } from "lucide-react";
 
 type Submenu = {
@@ -34,17 +34,17 @@ export function getMenuList(): Group[] {
         {
           href: "/courses",
           label: "Courses",
-          icon: SquarePen,
+          icon: BookOpen,
         },
         {
           href: "/projects",
           label: "Projects",
-          icon: Bookmark,
+          icon: Briefcase,
         },
         {
           href: "/org",
           label: "Org",
-          icon: Tag,
+          icon: Building,
         },
       ],
     },

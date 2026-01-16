@@ -1,10 +1,13 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { BookmarkIcon } from "lucide-react";
+import { AlertCircle, BookmarkIcon } from "lucide-react";
 import { Spinner } from "../ui/spinner";
 import { CourseSettingsSheet } from "./course-settings-sheet";
 import { useState } from "react";
 import GenerateQuiz from "./GenerateQuiz";
+import { AskAISheet } from "../ask-ai-sheet";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { useRouter } from "next/navigation";
 export interface courseEnrollment {
   profiles: {
     username: string;
@@ -27,6 +30,7 @@ type Props = {
   courseStatus: "ongoing" | "archived";
   participants: courseEnrollment[];
   isPublic: boolean;
+  shouldShowAlert?: boolean;
 };
 
 export const CourseActions = ({
@@ -41,11 +45,12 @@ export const CourseActions = ({
   courseStatus,
   participants,
   isPublic,
+  shouldShowAlert,
 }: Props) => {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isJoined, setIsJoined] = useState(isJoinedInitial);
-
 
   console.log("I AM THE ERROR AT THE COURSE ACTIONS COMPONENT ", error);
 
@@ -81,6 +86,7 @@ export const CourseActions = ({
           setIsJoined(true);
         }
       }
+      router.refresh();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.message || "An error occurred");
@@ -88,7 +94,33 @@ export const CourseActions = ({
       setLoading(false);
     }
   };
+  if (shouldShowAlert) {
+    return (
+      <Alert variant="destructive" className="mb-4">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Not Enrolled</AlertTitle>
 
+        <AlertDescription>
+          You need to enroll in this course to access the course content and
+          take quizzes. Click the &quot;Join Course&quot; button to enroll.
+          <Button
+            disabled={loading}
+            variant="outline"
+            onClick={onGenerateOnEnroll}
+          >
+            {loading ? (
+              <Spinner />
+            ) : (
+              <BookmarkIcon
+                className={isJoined ? "fill-blue-500 stroke-blue-500" : ""}
+              />
+            )}
+            {isJoined ? "Enrolled" : "Enroll"}
+          </Button>
+        </AlertDescription>
+      </Alert>
+    );
+  }
   return (
     <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between w-full">
       <div className="flex items-center justify-between gap-3 w-full">
@@ -129,10 +161,16 @@ export const CourseActions = ({
       ) : (
         <GenerateQuiz
           prompt={content ? content : courseOverview}
-            courseId={course_id}
+          courseId={course_id}
         />
-
       )}
+      <AskAISheet
+        pageContent={{
+          overview: courseOverview,
+          courseName: courseName,
+          courseDescription: courseDescription || "",
+        }}
+      />
     </div>
   );
 };

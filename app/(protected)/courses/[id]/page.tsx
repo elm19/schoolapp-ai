@@ -32,6 +32,7 @@ const CoursePage = async ({ params }: Props) => {
       )
       .eq("id", id)
       .single();
+    console.log("Course Data:", courseData);
     if (courseData.error) {
       throw courseData.error;
     }
@@ -45,7 +46,7 @@ const CoursePage = async ({ params }: Props) => {
       announcements,
       quizzes,
       course_enrollments,
-
+      file_url,
       is_public,
     } = courseData?.data ?? null;
     if (title === undefined) {
@@ -56,6 +57,10 @@ const CoursePage = async ({ params }: Props) => {
       (item: { profiles: { id: string } }) =>
         item.profiles.id === user.data.user?.id
     );
+
+    const isStudent = user.data.user?.user_metadata?.type === "student";
+    const shouldShowAlert = isStudent && !isJoinedInitial;
+
     return (
       <ContentLayout title={title}>
         <div className="mx-auto py-6 space-y-6">
@@ -76,29 +81,32 @@ const CoursePage = async ({ params }: Props) => {
                 courseDescription={overview}
                 courseStatus={"ongoing"}
                 // onGenerate={handleGenerate}
-                downloadHref={"/"}
+                downloadHref={file_url}
                 content={text_content}
                 userType={user.data.user?.user_metadata?.type}
                 isJoinedInitial={isJoinedInitial}
                 participants={course_enrollments}
                 isPublic={is_public}
+                shouldShowAlert={shouldShowAlert}
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <AnnouncementsSection
-                course_id={parseInt(id)}
-                announcements={announcements}
-              />
-              <QuizzesSection quizzes={quizzes} />
-            </div>
+          {!shouldShowAlert && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <AnnouncementsSection
+                  course_id={parseInt(id)}
+                  announcements={announcements}
+                />
+                <QuizzesSection quizzes={quizzes} />
+              </div>
 
-            <div className="space-y-4">
-              <DownloadSupport href={"/"} />
+              <div className="space-y-4">
+                <DownloadSupport href={"/"} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </ContentLayout>
     );
